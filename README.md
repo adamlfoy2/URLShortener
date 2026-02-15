@@ -1,4 +1,6 @@
-# Rsbuild project
+# Rsbuild project - URL shortener with express js backend
+
+This is a small project to demo an API that will shorten URLs
 
 ## Setup
 
@@ -10,27 +12,14 @@ npm install
 
 ## Get started
 
-Start the dev server, and the app will be available at [http://localhost:3000](http://localhost:3000).
+First, boot up the server. As stated by the proxy settings, this server runs on http://localhost:5000
 
 ```bash
-npm run dev
+npm run server
 ```
 
-Build the app for production:
+Then in another terminal, start the client frontend, and the app will be available at [http://localhost:3000](http://localhost:3000).
 
 ```bash
-npm run build
+npm run client
 ```
-
-Preview the production build locally:
-
-```bash
-npm run preview
-```
-
-## Learn more
-
-To learn more about Rsbuild, check out the following resources:
-
-- [Rsbuild documentation](https://rsbuild.rs) - explore Rsbuild features and APIs.
-- [Rsbuild GitHub repository](https://github.com/web-infra-dev/rsbuild) - your feedback and contributions are welcome!

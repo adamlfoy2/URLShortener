@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "rsbuild build",
-    "dev": "rsbuild dev --open",
+    "client": "rsbuild dev --open",
     "preview": "rsbuild preview",
     "server": "nodemon --watch 'src/*.ts' --exec npx tsx src/server.ts"
   },
