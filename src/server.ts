@@ -15,9 +15,17 @@ console.log("Success!\n");
 
 app.post("/api/createshorturl", (req, res) => {
   let url = req.body.post;
-  console.log(`Received URL: ${url}`);
+
+  // Validate URL with regex
+  const urlRegex =
+    /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+
+  if (!urlRegex.test(url)) {
+    res.status(400).send("Invalid URL");
+    return;
+  }
+
   res.send(createAndSendShortURL(url));
-  console.log(`Send URL: ${url}`);
 });
 
 app.get("/api/getshorturl/:hash", (req, res) => {
@@ -26,6 +34,11 @@ app.get("/api/getshorturl/:hash", (req, res) => {
   const shortURL = shortURLPrefix + shortUrlHash;
 
   const url = shortURLToURLPairs.get(shortURL);
+
+  if (!url) {
+    res.status(404).send("Short URL not found");
+    return;
+  }
   res.send(url);
 });
 
