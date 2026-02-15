@@ -1,0 +1,30 @@
+{
+  "name": "url_shortener",
+  "version": "1.0.0",
+  "private": true,
+  "proxy": "http://localhost:5000/",
+  "type": "module",
+  "scripts": {
+    "build": "rsbuild build",
+    "dev": "rsbuild dev --open",
+    "preview": "rsbuild preview",
+    "server": "nodemon --watch 'src/*.ts' --exec npx tsx src/server.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.21",
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "^1.7.1",
+    "@rsbuild/plugin-react": "^1.4.2",
+    "@types/body-parser": "^1.19.6",
+    "@types/express": "^5.0.6",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "prettier": "3.8.1",
+    "typescript": "^5.9.3"
+  }
+}
