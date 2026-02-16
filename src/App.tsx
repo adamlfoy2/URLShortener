@@ -25,7 +25,7 @@ const App = () => {
     e.preventDefault();
     // Extract the hash code from the shortened URL (e.g., "4" from "https://miniurl.com/4")
     const hashCode = inputShortUrl.split("/").pop() || inputShortUrl;
-    const response = await fetch(`/api/getshorturl/${hashCode}`);
+    const response = await fetch(`/api/getfullurl/${hashCode}`);
     const body = await response.text();
     setFetchedURL(body);
     const urlRegex =
