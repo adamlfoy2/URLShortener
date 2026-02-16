@@ -52,3 +52,39 @@ describe("URL shortener API", () => {
     expect(body).toBe("Short URL not found");
   });
 });
+
+// New server for rate limit test - seperate from other server instance to avoid side effects in other tests
+describe("URL shortener API - rate limit server", () => {
+  beforeAll(async () => {
+    await new Promise((r) => setTimeout(r, 100));
+    server.listen(PORT, () => {
+      console.log(`Rate limit test server running on port ${PORT}`);
+    });
+  });
+
+  afterAll((done) => {
+    server.close(done);
+  });
+
+  it("returns 429 when rate limit is exceeded", async () => {
+    const rateLimitURL = "https://example.com/rate-limit-test";
+    const limit = 1000;
+
+    for (let i = 0; i < limit; i++) {
+      await fetch(`${base}/api/createshorturl`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ post: rateLimitURL }),
+      });
+    }
+
+    // Rate limit next request
+    const rateLimitedRequest = await fetch(`${base}/api/createshorturl`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ post: rateLimitURL }),
+    });
+
+    expect(rateLimitedRequest.status).toBe(429);
+  });
+});
