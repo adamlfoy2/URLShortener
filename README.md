@@ -23,3 +23,9 @@ Then in another terminal, start the client frontend, and the app will be availab
 ```bash
 npm run client
 ```
+
+Run tests using 
+
+```bash
+npm run test
+```
