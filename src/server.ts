@@ -28,7 +28,7 @@ app.post("/api/createshorturl", (req, res) => {
   res.send(createAndSendShortURL(url));
 });
 
-app.get("/api/getshorturl/:hash", (req, res) => {
+app.get("/api/getfullurl/:hash", (req, res) => {
   let shortUrlHash = req.params.hash;
 
   const shortURL = shortURLPrefix + shortUrlHash;
@@ -62,4 +62,5 @@ function convertBigIntToBase62(num: bigint) {
   return result;
 }
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+const server = app.listen(port, () => console.log(`Listening on port ${port}`));
+export { app, server };
