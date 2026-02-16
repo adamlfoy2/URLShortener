@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import { limiter } from "./limiter.tsx";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -13,7 +14,7 @@ const shortURLPrefix = "https://miniurl.com/";
 
 console.log("Success!\n");
 
-app.post("/api/createshorturl", (req, res) => {
+app.post("/api/createshorturl", limiter, (req, res) => {
   let url = req.body.post;
 
   // Validate URL with regex
