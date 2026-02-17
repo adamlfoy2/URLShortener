@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-let num = 0n;
+let counter = 0n;
 const shortURLToURLPairs = new Map();
 const shortURLPrefix = "https://miniurl.com/";
 
@@ -44,9 +44,9 @@ app.get("/api/getfullurl/:hash", (req, res) => {
 });
 
 function createAndSendShortURL(url: string) {
-  num += 1n;
-  const hash = convertBigIntToBase62(num);
-  const shortURL = shortURLPrefix + hash;
+  counter += 1n;
+  const hybridHash = convertBigIntToBase62(counter) + generateUUIDHash();
+  const shortURL = shortURLPrefix + hybridHash;
   shortURLToURLPairs.set(shortURL, url);
   return shortURL;
 }
@@ -61,6 +61,13 @@ function convertBigIntToBase62(num: bigint) {
     num = num / 62n;
   }
   return result;
+}
+
+function generateUUIDHash() {
+  const UUID = crypto.randomUUID();
+  const UUIDToBigInt = BigInt(`0x${UUID.replace(/-/g, "")}`);
+  const hash = convertBigIntToBase62(UUIDToBigInt).substring(0, 2);
+  return hash;
 }
 
 const server = app.listen(port, () => console.log(`Listening on port ${port}`));
