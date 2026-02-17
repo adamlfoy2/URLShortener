@@ -5,9 +5,6 @@ const base = `http://localhost:${PORT}`;
 
 describe("URL shortener API", () => {
   beforeAll(async () => {
-    server.listen(PORT, () => {
-      console.log(`Primary test server running on port ${PORT}`);
-    });
     await new Promise((r) => setTimeout(r, 100));
   });
 
