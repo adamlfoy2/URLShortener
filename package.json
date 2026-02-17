@@ -8,8 +8,9 @@
     "build": "rsbuild build",
     "client": "rsbuild dev --open",
     "preview": "rsbuild preview",
-    "server": "nodemon --watch 'src/*.ts' --exec npx tsx src/server.tsx",
-    "test": "jest"
+    "server": "nodemon --watch 'src/*.ts' --exec npx tsx src/server.ts",
+    "test": "jest",
+    "stop": "taskkill /f /im node.exe"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
