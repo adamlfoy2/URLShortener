@@ -15,7 +15,7 @@ describe("URL shortener API", () => {
   it("creates and retrieves a short URL", async () => {
     const validLongURL = "https://example.com/test-path";
 
-    const createShortURL = await fetch(`${base}/api/createshorturl`, {
+    const createShortURL = await fetch(`${base}/api/postcreateshorturl`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ post: validLongURL }),
@@ -33,14 +33,17 @@ describe("URL shortener API", () => {
   });
 
   it("returns 400 for invalid URL", async () => {
-    const createShortURL = await fetch(`${base}/api/createshorturl`, {
+    const createShortURL = await fetch(`${base}/api/postcreateshorturl`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ post: "not-a-valid-url" }),
     });
     expect(createShortURL.status).toBe(400);
-    const createShortURLResponse = await createShortURL.text();
-    expect(createShortURLResponse).toBe("Invalid URL");
+    const createShortURLResponse = await createShortURL.json();
+    expect(createShortURLResponse).toEqual({
+      userErrorMessage: "Please provide a valid URL and try again.",
+      devErrorMessage: "400: The URL provided is not valid.",
+    });
   });
 
   it("returns 404 for unknown short URL", async () => {
@@ -48,8 +51,12 @@ describe("URL shortener API", () => {
       `${base}/api/getfullurl/thisdoesnotexist123`,
     );
     expect(invalidGetFullURLRequest.status).toBe(404);
-    const body = await invalidGetFullURLRequest.text();
-    expect(body).toBe("Short URL not found");
+    const body = await invalidGetFullURLRequest.json();
+    expect(body).toEqual({
+      userErrorMessage:
+        "The short URL provided does not exist. Please double check the URL and try again.",
+      devErrorMessage: "404: Short URL not found in the database.",
+    });
   });
 });
 
@@ -71,7 +78,7 @@ describe("URL shortener API - rate limit server", () => {
     const limit = 1000;
 
     for (let i = 0; i < limit; i++) {
-      await fetch(`${base}/api/createshorturl`, {
+      await fetch(`${base}/api/postcreateshorturl`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ post: rateLimitURL }),
@@ -79,7 +86,7 @@ describe("URL shortener API - rate limit server", () => {
     }
 
     // Rate limit next request
-    const rateLimitedRequest = await fetch(`${base}/api/createshorturl`, {
+    const rateLimitedRequest = await fetch(`${base}/api/postcreateshorturl`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ post: rateLimitURL }),

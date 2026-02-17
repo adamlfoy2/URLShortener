@@ -12,9 +12,14 @@ let counter = 0n;
 const shortURLToURLPairs = new Map();
 const shortURLPrefix = "https://miniurl.com/";
 
+interface ErrorObject {
+  userErrorMessage: string;
+  devErrorMessage: string;
+}
+
 console.log("Success!\n");
 
-app.post("/api/createshorturl", limiter, (req, res) => {
+app.post("/api/postcreateshorturl", limiter, (req, res) => {
   let url = req.body.post;
 
   // Validate URL with regex
@@ -22,7 +27,11 @@ app.post("/api/createshorturl", limiter, (req, res) => {
     /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 
   if (!urlRegex.test(url)) {
-    res.status(400).send("Invalid URL");
+    const errorResponse: ErrorObject = {
+      userErrorMessage: "Please provide a valid URL and try again.",
+      devErrorMessage: "400: The URL provided is not valid.",
+    };
+    res.status(400).json(errorResponse);
     return;
   }
 
@@ -37,7 +46,12 @@ app.get("/api/getfullurl/:hash", (req, res) => {
   const url = shortURLToURLPairs.get(shortURL);
 
   if (!url) {
-    res.status(404).send("Short URL not found");
+    const errorResponse: ErrorObject = {
+      userErrorMessage:
+        "The short URL provided does not exist. Please double check the URL and try again.",
+      devErrorMessage: "404: Short URL not found in the database.",
+    };
+    res.status(404).json(errorResponse);
     return;
   }
   res.send(url);

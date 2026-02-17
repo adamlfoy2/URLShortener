@@ -3,13 +3,18 @@ import "./App.css";
 
 const App = () => {
   const [url, setUrl] = useState<string>("");
-  const [createdShortUrl, setCreatedShortUrl] = useState<string>("");
-  const [fetchedURL, setFetchedURL] = useState<string>("");
+  const [POSTUrlResponse, setPOSTUrlResponse] = useState<ApiResponse>();
+  const [GETURLResponse, setGETURLResponse] = useState<ApiResponse>();
   const [inputShortUrl, setInputShortUrl] = useState<string>("");
+
+  interface ApiResponse {
+    response: Response;
+    message: string;
+  }
 
   const handleCreateShortURL = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    const response = await fetch("/api/createshorturl", {
+    const response = await fetch("/api/postcreateshorturl", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -17,17 +22,77 @@ const App = () => {
       },
       body: JSON.stringify({ post: url }),
     });
+    if (!response.ok) {
+      try {
+        const err = (await response.json()) as {
+          userErrorMessage?: string;
+          devErrorMessage?: string;
+        };
+        console.log(err.devErrorMessage);
+        setPOSTUrlResponse({
+          response,
+          message: err.userErrorMessage || "An error occurred.",
+        });
+      } catch (parseErr) {
+        console.log("Failed to parse error response", parseErr);
+        setPOSTUrlResponse({
+          response,
+          message: "An error occurred.",
+        });
+      }
+      return;
+    }
+
     const body = await response.text();
-    setCreatedShortUrl(body);
+    setPOSTUrlResponse({ response, message: body });
   };
 
   const handleGetURL = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    // Extract the hash code from the shortened URL (e.g., "4" from "https://miniurl.com/4")
+
+    if (!inputShortUrl) {
+      setGETURLResponse({
+        response: new Response(undefined, { status: 400 }),
+        message: "Please provide a mini URL and try again.",
+      });
+      return;
+    }
+
+    const specialCharactersRegexAndSpace = /[ !@#$%^&*(),.?":{}|<>\/\\]/g;
+    if (specialCharactersRegexAndSpace.test(inputShortUrl)) {
+      setGETURLResponse({
+        response: new Response(undefined, { status: 400 }),
+        message:
+          "The short URL contains special characters that are not allowed.",
+      });
+      return;
+    }
     const hashCode = inputShortUrl.split("/").pop() || inputShortUrl;
     const response = await fetch(`/api/getfullurl/${hashCode}`);
+
+    if (!response.ok) {
+      try {
+        const err = (await response.json()) as {
+          userErrorMessage?: string;
+          devErrorMessage?: string;
+        };
+        console.log(err.devErrorMessage);
+        setGETURLResponse({
+          response,
+          message: err.userErrorMessage || "An error occurred.",
+        });
+      } catch (parseErr) {
+        console.log("Failed to parse error response", parseErr);
+        setGETURLResponse({
+          response,
+          message: "An error occurred.",
+        });
+      }
+      return;
+    }
+
     const body = await response.text();
-    setFetchedURL(body);
+    setGETURLResponse({ response, message: body });
     const urlRegex =
       /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 
@@ -52,7 +117,14 @@ const App = () => {
         <button type="submit">Submit</button>
       </form>
       <br />
-      <div>{createdShortUrl && <p>Shortened URL: {createdShortUrl}</p>}</div>
+      <div>
+        {POSTUrlResponse &&
+          (POSTUrlResponse.response.ok ? (
+            <p>Shortened URL: {POSTUrlResponse.message}</p>
+          ) : (
+            <p>{POSTUrlResponse.message}</p>
+          ))}
+      </div>
       <br />
 
       <form onSubmit={handleGetURL}>
@@ -69,7 +141,14 @@ const App = () => {
         <button type="submit">Submit</button>
       </form>
       <br />
-      <div>{fetchedURL && <p>Fetched URL: {fetchedURL}</p>}</div>
+      <div>
+        {GETURLResponse &&
+          (GETURLResponse.response.ok ? (
+            <p>Fetched URL: {GETURLResponse.message}</p>
+          ) : (
+            <p>{GETURLResponse.message}</p>
+          ))}
+      </div>
       <br />
     </div>
   );
